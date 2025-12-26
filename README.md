@@ -2,15 +2,11 @@
 
 A sophisticated Windows WPF application that provides a transparent, always-visible notes window that remains hidden from screen capture software (Zoom, Microsoft Teams, Google Meet, etc.).
 
----
-
 ## Developer
 
 **Created by: Jose Mondragon (MDragon Solutions)**
 
 This application was developed with precision and care to provide a secure notes-taking experience while screen sharing.
-
----
 
 ## Features
 
@@ -24,8 +20,6 @@ This application was developed with precision and care to provide a secure notes
 - **Adjustable Font Size**: Use numeric input (8 - 32) with Enter key to change note text size
 - **Tabbed Interface**: Switch between Text notes and Image content (expandable feature)
 - **Keyboard Shortcut**: Global Alt+P hotkey works even when window is in pass-through mode
-
----
 
 ## Quick Start
 
@@ -50,8 +44,6 @@ cd bin/Debug/net10.0-windows
 TransparentNotesApp.exe
 ```
 
----
-
 ## Usage Guide
 
 ### Window Controls
@@ -72,8 +64,6 @@ TransparentNotesApp.exe
 ### Minimum Window Size
 - **Width**: 475 pixels
 - **Height**: 100 pixels
-
----
 
 ## Technical Architecture
 
@@ -131,8 +121,6 @@ MainWindow (Transparent, No Title Bar)
 3. No External Connections: Works completely offline
 4. No Tracking: Zero telemetry or analytics
 
----
-
 ## Advanced Features
 
 ### Pass-Through Mode
@@ -154,8 +142,6 @@ When "Always on Top" is checked:
 - Real-time preview as you type (before pressing Enter)
 - Values are automatically clamped to valid range
 
----
-
 ## Code Quality
 
 ### Code Review Results
@@ -166,16 +152,12 @@ When "Always on Top" is checked:
 - Cleaned: Removed 7 unused using statements (System.Text, System.Windows.Data, System.Windows.Documents, System.Windows.Media, System.Windows.Media.Imaging, System.Windows.Navigation)
 - Result: Clean, maintainable codebase with no dead code
 
----
-
 ## Known Limitations
 
 1. Image Tab: Currently a placeholder - can be extended to load and display images
 2. Persistence: Notes content is not saved between sessions (can be added via serialization)
 3. Windows Only: Application requires Windows OS and relies on Windows-specific APIs
 4. Screen Capture Evasion: Effectiveness depends on the specific screen sharing software and its implementation
-
----
 
 ## Version History
 
@@ -184,8 +166,6 @@ When "Always on Top" is checked:
 - Core features implemented: screen capture hiding, transparency, resizing, pass-through mode
 - Numeric controls for opacity and font size (instead of sliders)
 - Global Alt+P hotkey for pass-through toggle
-
----
 
 ## Contributing
 
@@ -198,15 +178,11 @@ Suggestions for improvements:
 - Extend Image tab functionality
 - Add system tray integration
 
----
-
 ## License
 
 This project is created by José Mondragon (MDragon Solutions) for portfolio purposes.
 
-**Created by: José Mondragon - MDragon Solutions**
-
----
+**Created by: Jose Mondragon - MDragon Solutions**
 
 ## Future Enhancements
 
@@ -221,14 +197,6 @@ This project is created by José Mondragon (MDragon Solutions) for portfolio pur
 - Note encryption
 - Export to PDF/TXT
 
----
-
-## Contact
-
-**Developer**: José Mondragon (MDragon Solutions)
-
----
-
 ## Project Structure
 
 ```
@@ -242,8 +210,6 @@ TransparentNotesApp/
 └── bin/                     # Build output
 ```
 
----
-
 ## Windows APIs Used
 
 - SetWindowDisplayAffinity: Hide window from screen capture
@@ -251,8 +217,6 @@ TransparentNotesApp/
 - WS_EX_TRANSPARENT: Extended window style for click-through
 - RegisterHotKey/UnregisterHotKey: Global hotkey registration
 - HwndSource.AddHook: Message interception for hotkey handling
-
----
 
 ## Architecture Diagrams
 
@@ -494,9 +458,7 @@ graph TB
     style State fill:#f0f4c3
 ```
 
----
-
 **Last Updated**: December 25, 2025
-**Created by**: José Mondragon - MDragon Solutions
+**Created by**: Jose Mondragon - MDragon Solutions
 **Project Type**: WPF Desktop Application (.NET 10.0)
 
