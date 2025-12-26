@@ -1,0 +1,110 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Visual Studio Code directory
+.vscode/
+
+# Rider IDE
+.idea/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local History for Visual Studio
+.localhistory/
+
+# BeatPulse healthcheck temp database
+healthchecksdb
+
+# Backup & swap files
+*.swp
+*.swo
+*~
+*.tmp
+
+# OS specific files
+.DS_Store
+Thumbs.db
+*.lnk
+
+# NuGet
+*.nupkg
+*.snupkg
+NuGet.idtx
+.nuget/
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+coverage.json
+*.opencover.xml
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code extensions
+extensions.json
+launch.json
+settings.json
+
+# Application specific
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE specific
+.editorconfig.user
+
+# Temporary files
+*.temp
+*.tmp
+*.bak
+*.backup
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Package manager files
+packages/
+Package.lock.json
+
+# Misc
+*.class
+*.jar

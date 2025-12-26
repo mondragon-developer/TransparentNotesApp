@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TransparentNotesApp.Tests/TransparentNotesApp.Tests.csproj" />
+  <Project Path="TransparentNotesApp/TransparentNotesApp.csproj" />
+</Solution>
