@@ -1,4 +1,5 @@
 # Transparent Notes App
+<img width="572" height="563" alt="image" src="https://github.com/user-attachments/assets/c7376b38-1f22-488b-a587-bc6e5e9a64e0" />
 
 A sophisticated Windows WPF application that provides a transparent, always-visible notes window that remains hidden from screen capture software (Zoom, Microsoft Teams, Google Meet, etc.).
 
