@@ -1,5 +1,4 @@
 # Transparent Notes App
-<img width="572" height="563" alt="image" src="https://github.com/user-attachments/assets/c7376b38-1f22-488b-a587-bc6e5e9a64e0" />
 
 A sophisticated Windows WPF application that provides a transparent, always-visible notes window that remains hidden from screen capture software (Zoom, Microsoft Teams, Google Meet, etc.).
 
@@ -14,6 +13,9 @@ This application was developed with precision and care to provide a secure notes
 ### Core Features
 - **Screen Capture Invisible**: The window is completely hidden from screen sharing software (Zoom, Microsoft Teams, Google Meet, OBS, etc.) using Windows API `SetWindowDisplayAffinity`
 - **Transparent Window**: Semi-transparent notes window (adjustable opacity: 0.1 - 1.0) that doesn't interfere with content visibility
+- **Rich Text Formatting**: Bold text, bullet lists, and numbered lists with a formatting toolbar
+- **Paste from Word/Google Docs**: Supports pasting formatted content including tables from external applications
+- **Automatic Note Persistence**: Notes are automatically saved and restored between sessions (stored as RTF)
 - **Resizable Window**: Drag the bottom-right corner to resize the window to fit your needs
 - **Always on Top**: Toggle window to stay above all other applications
 - **Pass-Through Mode**: Press **Alt+P** to toggle mouse pass-through mode - when enabled, mouse clicks pass through the window to applications underneath
@@ -21,6 +23,7 @@ This application was developed with precision and care to provide a secure notes
 - **Adjustable Font Size**: Use numeric input (8 - 32) with Enter key to change note text size
 - **Tabbed Interface**: Switch between Text notes and Image content (expandable feature)
 - **Keyboard Shortcut**: Global Alt+P hotkey works even when window is in pass-through mode
+- **Code Signed**: Digitally signed with Microsoft Azure Trusted Signing for security and trust
 
 ## Quick Start
 
@@ -31,18 +34,23 @@ This application was developed with precision and care to provide a secure notes
 
 ### Installation
 
-1. Download or clone the repository
+#### Option 1: Download Release (Recommended)
+1. Go to the [Releases](https://github.com/yourusername/TransparentNotesApp/releases) page
+2. Download `TransparentNotesApp.exe` (single-file, self-contained)
+3. Double-click to run - no installation required!
+
+#### Option 2: Build from Source
+1. Clone the repository
 2. Navigate to the `TransparentNotesApp` folder
 3. Run the application:
    ```bash
    dotnet run
    ```
 
-Or build and run:
+Or build and publish a release:
 ```bash
-dotnet build
-cd bin/Debug/net10.0-windows
-TransparentNotesApp.exe
+dotnet publish -c Release
+# Output: TransparentNotesApp/bin/Release/net10.0-windows/win-x64/publish/TransparentNotesApp.exe
 ```
 
 ## Usage Guide
@@ -54,6 +62,9 @@ TransparentNotesApp.exe
 | **Always on Top Checkbox** | Check/Uncheck | Toggle window to stay above all other windows and enable pass-through mode |
 | **Opacity TextBox** | Type value (0.1-1.0) + Enter | Adjust window transparency (0.1 = very transparent, 1.0 = opaque) |
 | **Font Size TextBox** | Type value (8-32) + Enter | Change the size of text in the notes area |
+| **Bold Button (B)** | Click | Toggle bold formatting on selected text |
+| **Bullet List Button (•)** | Click | Create or toggle bullet list |
+| **Numbered List Button (1.)** | Click | Create or toggle numbered list |
 | **Alt+P Hotkey** | Press anywhere | Toggle pass-through mode (allows clicks to pass through window) |
 | **Bottom-Right Corner** | Drag | Resize the window to your desired dimensions |
 
@@ -101,14 +112,23 @@ Main WPF window with event handlers:
 MainWindow (Transparent, No Title Bar)
 ├── Grid (2 rows: Auto for controls, * for content)
 │   ├── StackPanel (Row 0 - Controls)
-│   │   ├── AlwaysOnTopCheckBox + Label
+│   │   ├── AlwaysOnTopCheckBox + Label + Alt+P Tip
 │   │   ├── OpacityTextBox (0.1-1.0)
 │   │   └── FontSizeTextBox (8-32)
 │   ├── TabControl (Row 1 - Content)
-│   │   ├── Text Tab (TextBox for notes)
+│   │   ├── Text Tab
+│   │   │   ├── ToolBar (Bold, Bullet List, Numbered List)
+│   │   │   └── RichTextBox (FlowDocument)
 │   │   └── Image Tab (Placeholder)
 │   └── ResizeArea (Rectangle overlay - transparent, 40x40)
 ```
+
+### Notes Storage
+Notes are automatically saved to:
+```
+%LOCALAPPDATA%\TransparentNotesApp\notes.rtf
+```
+(e.g., `C:\Users\YourName\AppData\Local\TransparentNotesApp\notes.rtf`)
 
 ---
 
@@ -156,13 +176,22 @@ When "Always on Top" is checked:
 ## Known Limitations
 
 1. Image Tab: Currently a placeholder - can be extended to load and display images
-2. Persistence: Notes content is not saved between sessions (can be added via serialization)
-3. Windows Only: Application requires Windows OS and relies on Windows-specific APIs
-4. Screen Capture Evasion: Effectiveness depends on the specific screen sharing software and its implementation
+2. Windows Only: Application requires Windows OS and relies on Windows-specific APIs
+3. Screen Capture Evasion: Effectiveness depends on the specific screen sharing software and its implementation
 
 ## Version History
 
-### v1.0 (Current)
+### v1.1 (Current)
+- Added rich text formatting (bold, bullet lists, numbered lists)
+- Added automatic note persistence (saves/loads RTF format)
+- Added paste support for formatted content from Word/Google Docs
+- Added formatting toolbar
+- Configured single-file self-contained executable
+- Added Azure Trusted Signing for code signing
+- Added GitHub Actions workflow for automated signed releases
+- Added application icon
+
+### v1.0
 - Initial release
 - Core features implemented: screen capture hiding, transparency, resizing, pass-through mode
 - Numeric controls for opacity and font size (instead of sliders)
@@ -173,21 +202,20 @@ When "Always on Top" is checked:
 This is a personal portfolio project by José Mondragon (MDragon Solutions). 
 
 Suggestions for improvements:
-- Add note persistence (JSON/SQLite storage)
 - Implement color themes
-- Add more keyboard shortcuts
+- Add more keyboard shortcuts (Ctrl+B for bold, etc.)
 - Extend Image tab functionality
 - Add system tray integration
+- Add italic and underline formatting
 
 ## License
 
 This project is created by José Mondragon (MDragon Solutions) for portfolio purposes.
 
-**Created by: Jose Mondragon - MDragon Solutions**
+**Created by: José Mondragon - MDragon Solutions**
 
 ## Future Enhancements
 
-- Save/Load notes functionality
 - Custom themes (dark mode, colors)
 - Note templates
 - Auto-backup feature
@@ -197,18 +225,26 @@ This project is created by José Mondragon (MDragon Solutions) for portfolio pur
 - Cloud sync (optional)
 - Note encryption
 - Export to PDF/TXT
+- Italic and underline formatting
+- Keyboard shortcuts for formatting
 
 ## Project Structure
 
 ```
 TransparentNotesApp/
-├── MainWindow.xaml          # UI Layout definition
-├── MainWindow.xaml.cs       # Main window logic & event handlers
-├── App.xaml                 # Application resources
-├── App.xaml.cs              # Application startup logic
-├── AssemblyInfo.cs          # Assembly metadata
-├── TransparentNotesApp.csproj # Project configuration
-└── bin/                     # Build output
+├── .github/
+│   └── workflows/
+│       └── release.yml      # GitHub Actions for signed releases
+├── TransparentNotesApp/
+│   ├── MainWindow.xaml      # UI Layout definition
+│   ├── MainWindow.xaml.cs   # Main window logic & event handlers
+│   ├── App.xaml             # Application resources
+│   ├── App.xaml.cs          # Application startup logic
+│   ├── AssemblyInfo.cs      # Assembly metadata
+│   ├── app.ico              # Application icon
+│   └── TransparentNotesApp.csproj # Project configuration
+└── TransparentNotesApp.Tests/
+    └── MainWindowTests.cs   # Unit tests
 ```
 
 ## Windows APIs Used
@@ -218,6 +254,8 @@ TransparentNotesApp/
 - WS_EX_TRANSPARENT: Extended window style for click-through
 - RegisterHotKey/UnregisterHotKey: Global hotkey registration
 - HwndSource.AddHook: Message interception for hotkey handling
+
+## Architecture Diagrams
 
 ### System Architecture
 
@@ -258,8 +296,206 @@ graph TB
     style WinAPI fill:#fff3e0
 ```
 
+### Event Flow Diagram
 
-**Last Updated**: December 25, 2025
-**Created by**: Jose Mondragon - MDragon Solutions
+```mermaid
+sequenceDiagram
+    participant User
+    participant MainWindow
+    participant WindowHelper
+    participant WinAPI as Windows API
+
+    User->>MainWindow: Window Load
+    MainWindow->>WindowHelper: HideFromScreenCapture
+    WindowHelper->>WinAPI: SetWindowDisplayAffinity
+    MainWindow->>WindowHelper: RegisterGlobalHotkey
+    WindowHelper->>WinAPI: RegisterHotKey Alt+P
+
+    User->>MainWindow: Drag Window Edge
+    MainWindow->>MainWindow: Window_MouseDown
+    MainWindow->>MainWindow: DragMove()
+
+    User->>MainWindow: Mouse on Resize Area
+    MainWindow->>MainWindow: ResizeArea_MouseDown
+    MainWindow->>MainWindow: isResizing = true
+    MainWindow->>WindowHelper: Disable Transparency
+    MainWindow->>MainWindow: Capture Mouse
+
+    User->>MainWindow: Drag Resize Corner
+    MainWindow->>MainWindow: ResizeArea_MouseMove
+    MainWindow->>MainWindow: Calculate Delta X/Y
+    MainWindow->>MainWindow: Update Width/Height
+
+    User->>MainWindow: Release Mouse
+    MainWindow->>MainWindow: ResizeArea_MouseUp
+    MainWindow->>WindowHelper: Restore Transparency
+
+    User->>MainWindow: Type Opacity + Enter
+    MainWindow->>MainWindow: OpacityTextBox_PreviewKeyDown
+    MainWindow->>MainWindow: Parse & Validate 0.1-1.0
+    MainWindow->>MainWindow: Set Window.Opacity
+
+    User->>MainWindow: Check Always On Top
+    MainWindow->>MainWindow: AlwaysOnTopCheckBox_Checked
+    MainWindow->>MainWindow: Set Topmost = true
+    MainWindow->>WindowHelper: Enable Click-Through
+
+    User->>WinAPI: Press Alt+P (Global)
+    WinAPI->>MainWindow: WndProc - WM_HOTKEY
+    MainWindow->>MainWindow: Toggle isMouseTransparent
+    MainWindow->>WindowHelper: SetMouseTransparent()
+```
+
+### Windows API Integration Diagram
+
+```mermaid
+flowchart LR
+    subgraph Application["Application Layer"]
+        MainWin["MainWindow"]
+        Helper["WindowHelper"]
+    end
+    
+    subgraph PInvoke["P/Invoke Layer"]
+        SetDispAff["SetWindowDisplayAffinity"]
+        RegHotKey["RegisterHotKey"]
+        GetWL["GetWindowLong"]
+        SetWL["SetWindowLong"]
+        HwndSrc["HwndSource.AddHook"]
+    end
+    
+    subgraph Windows["Windows API Layer"]
+        user32["user32.dll"]
+    end
+    
+    MainWin -->|Hide from Capture| Helper
+    MainWin -->|Register Hotkey| Helper
+    MainWin -->|Set Transparency| Helper
+    MainWin -->|Message Hook| HwndSrc
+    
+    Helper -->|WDA_EXCLUDEFROMCAPTURE| SetDispAff
+    Helper -->|MOD_ALT + VK_P| RegHotKey
+    Helper -->|GWL_EXSTYLE| GetWL
+    Helper -->|WS_EX_TRANSPARENT| SetWL
+    
+    SetDispAff --> user32
+    RegHotKey --> user32
+    GetWL --> user32
+    SetWL --> user32
+    HwndSrc --> user32
+    
+    style Application fill:#e3f2fd
+    style PInvoke fill:#f3e5f5
+    style Windows fill:#fff3e0
+```
+
+### Data Flow - Opacity Control
+
+```mermaid
+flowchart TD
+    A["User Types Value<br/>e.g., '0.5'"] --> B["TextBox Displays Input"]
+    B --> C["User Presses ENTER"]
+    C --> D["PreviewKeyDown Event Fires"]
+    D --> E{"Parse Double<br/>Successful?"}
+    E -->|No| F["Ignore Invalid Input"]
+    E -->|Yes| G["Clamp to Range<br/>0.1 - 1.0"]
+    G --> H["Set window.Opacity"]
+    H --> I["Format Display<br/>0.50"]
+    I --> J["Update UI"]
+    J --> K["Window Transparency Changed"]
+    
+    style A fill:#c8e6c9
+    style B fill:#c8e6c9
+    style C fill:#ffccbc
+    style D fill:#b3e5fc
+    style E fill:#ffe0b2
+    style G fill:#e1bee7
+    style H fill:#f0f4c3
+    style K fill:#c8e6c9
+```
+
+### Pass-Through Mode State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Normal
+    
+    Normal: Normal Mode
+    Normal: Window captures mouse
+    Normal: User interacts with window
+    
+    PassThrough: Pass-Through Mode
+    PassThrough: Mouse clicks pass through
+    PassThrough: Interact with app underneath
+    PassThrough: Window still visible on top
+    
+    Normal -->|Alt+P OR<br/>Check Always on Top| PassThrough
+    PassThrough -->|Alt+P OR<br/>Uncheck Always on Top| Normal
+    
+    note right of Normal
+        isMouseTransparent = false
+        Topmost may be true/false
+    end note
+    
+    note right of PassThrough
+        isMouseTransparent = true
+        Topmost = true
+    end note
+```
+
+### Component Interaction Diagram
+
+```mermaid
+graph TB
+    subgraph Events["User Events"]
+        E1["Mouse Down"]
+        E2["Mouse Move"]
+        E3["Mouse Up"]
+        E4["Key Press"]
+        E5["Checkbox Toggle"]
+        E6["Global Hotkey Alt+P"]
+    end
+    
+    subgraph Handlers["Event Handlers"]
+        H1["Window_MouseDown<br/>DragMove"]
+        H2["ResizeArea_MouseDown<br/>Start Resize"]
+        H3["ResizeArea_MouseMove<br/>Update Size"]
+        H4["ResizeArea_MouseUp<br/>End Resize"]
+        H5["TextBox_PreviewKeyDown<br/>Validate Input"]
+        H6["Checkbox_Checked/Unchecked<br/>Toggle Mode"]
+        H7["WndProc Message Hook<br/>Global Hotkey"]
+    end
+    
+    subgraph State["State Changes"]
+        S1["isResizing"]
+        S2["window.Width/Height"]
+        S3["window.Opacity"]
+        S4["window.Topmost"]
+        S5["isMouseTransparent"]
+    end
+    
+    E1 --> H1
+    E1 --> H2
+    E2 --> H3
+    E3 --> H4
+    E4 --> H5
+    E5 --> H6
+    E6 --> H7
+    
+    H1 -.-> S5
+    H2 -.-> S1
+    H3 -.-> S2
+    H4 -.-> S1
+    H5 -.-> S3
+    H6 -.-> S4
+    H6 -.-> S5
+    H7 -.-> S5
+    
+    style Events fill:#b3e5fc
+    style Handlers fill:#c8e6c9
+    style State fill:#f0f4c3
+```
+
+**Last Updated**: December 26, 2025
+**Created by**: José Mondragon - MDragon Solutions
 **Project Type**: WPF Desktop Application (.NET 10.0)
 

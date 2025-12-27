@@ -6,6 +6,43 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <!-- Application metadata -->
+    <AssemblyTitle>Transparent Notes</AssemblyTitle>
+    <Product>Transparent Notes App</Product>
+    <Company>MDragon Solutions</Company>
+    <Copyright>Copyright (c) 2025 Jose Mondragon - MDragon Solutions</Copyright>
+    <Version>1.0.0</Version>
+
+    <!-- Application icon -->
+    <ApplicationIcon>app.ico</ApplicationIcon>
+
+    <!-- Single-file publish settings -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
+
+  <!-- Release-specific settings -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <!--
+    Azure Trusted Signing Configuration
+
+    Prerequisites (one-time setup):
+    1. az login
+    2. Download Trusted Signing Client:
+       Invoke-WebRequest -Uri "https://www.nuget.org/api/v2/package/Microsoft.Trusted.Signing.Client" -OutFile "$env:TEMP\trustedsigning.zip"
+       Expand-Archive -Path "$env:TEMP\trustedsigning.zip" -DestinationPath "C:\TrustedSigning" -Force
+    3. Create C:\TrustedSigning\metadata.json with your account info
+
+    After publishing, sign with:
+    & "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe" sign /v /fd SHA256 /tr "http://timestamp.digicert.com" /td SHA256 /dlib "C:\TrustedSigning\bin\x64\Azure.CodeSigning.Dlib.dll" /dmdf "C:\TrustedSigning\metadata.json" "bin\Release\net10.0-windows\win-x64\publish\TransparentNotesApp.exe"
+  -->
 
 </Project>

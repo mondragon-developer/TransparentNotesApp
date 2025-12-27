@@ -1,6 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -95,6 +97,7 @@ namespace TransparentNotesApp
         private Point lastMousePosition;
         private bool isMouseTransparent = false;
         private IntPtr hwnd;
+        private readonly string notesFilePath;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -103,22 +106,36 @@ namespace TransparentNotesApp
         public MainWindow()
         {
             InitializeComponent();
-            this.Loaded += (s, e) => 
+
+            // Initialize notes file path in AppData
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string appFolder = System.IO.Path.Combine(appDataPath, "TransparentNotesApp");
+            Directory.CreateDirectory(appFolder);
+            notesFilePath = System.IO.Path.Combine(appFolder, "notes.rtf");
+
+            this.Loaded += (s, e) =>
             {
                 hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
                 WindowHelper.HideFromScreenCapture(this);
                 WindowHelper.RegisterGlobalHotkey(this);
-                
+
                 // Initialize UI elements with current values
                 OpacityTextBox.Text = this.Opacity.ToString("F2");
-                FontSizeTextBox.Text = NotesTextBox.FontSize.ToString("F0");
-                
+                FontSizeTextBox.Text = NotesRichTextBox.FontSize.ToString("F0");
+
                 // Register message hook for global hotkey detection
                 var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
                 if (source != null)
                     source.AddHook(WndProc);
+
+                // Load saved notes
+                LoadNotes();
             };
-            this.Closing += (s, e) => WindowHelper.UnregisterGlobalHotkey(this);
+            this.Closing += (s, e) =>
+            {
+                SaveNotes();
+                WindowHelper.UnregisterGlobalHotkey(this);
+            };
         }
 
         /// <summary>
@@ -244,10 +261,10 @@ namespace TransparentNotesApp
         {
             if (e.Key == Key.Return)
             {
-                if (NotesTextBox != null && double.TryParse(FontSizeTextBox.Text, out double fontSize))
+                if (NotesRichTextBox != null && double.TryParse(FontSizeTextBox.Text, out double fontSize))
                 {
                     fontSize = Math.Max(8, Math.Min(32, fontSize));
-                    NotesTextBox.FontSize = fontSize;
+                    NotesRichTextBox.FontSize = fontSize;
                     FontSizeTextBox.Text = fontSize.ToString("F0");
                 }
                 e.Handled = true;
@@ -274,6 +291,178 @@ namespace TransparentNotesApp
             this.Topmost = false;
             isMouseTransparent = false;
             WindowHelper.SetMouseTransparent(this, false);
+        }
+
+        /// <summary>
+        /// Handles the Bold button click - toggles bold formatting on selection.
+        /// </summary>
+        private void BoldButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selection = NotesRichTextBox.Selection;
+            object currentWeight = selection.GetPropertyValue(TextElement.FontWeightProperty);
+            FontWeight newWeight = (currentWeight is FontWeight weight && weight == FontWeights.Bold)
+                ? FontWeights.Normal
+                : FontWeights.Bold;
+            selection.ApplyPropertyValue(TextElement.FontWeightProperty, newWeight);
+            NotesRichTextBox.Focus();
+        }
+
+        /// <summary>
+        /// Handles the Bullet List button click - creates a bullet list.
+        /// </summary>
+        private void BulletListButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyListStyle(TextMarkerStyle.Disc);
+            NotesRichTextBox.Focus();
+        }
+
+        /// <summary>
+        /// Handles the Numbered List button click - creates a numbered list.
+        /// </summary>
+        private void NumberedListButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyListStyle(TextMarkerStyle.Decimal);
+            NotesRichTextBox.Focus();
+        }
+
+        /// <summary>
+        /// Applies the specified list style to the current selection or paragraph.
+        /// </summary>
+        private void ApplyListStyle(TextMarkerStyle markerStyle)
+        {
+            var selection = NotesRichTextBox.Selection;
+            var start = selection.Start.Paragraph;
+            var end = selection.End.Paragraph;
+
+            if (start == null) return;
+
+            // Check if already in a list
+            if (start.Parent is ListItem listItem && listItem.Parent is List existingList)
+            {
+                if (existingList.MarkerStyle == markerStyle)
+                {
+                    // Remove from list
+                    RemoveFromList(listItem);
+                    return;
+                }
+                else
+                {
+                    // Change list type
+                    existingList.MarkerStyle = markerStyle;
+                    return;
+                }
+            }
+
+            // Create new list
+            var list = new List { MarkerStyle = markerStyle };
+            var document = NotesRichTextBox.Document;
+
+            // Collect paragraphs to convert
+            var paragraphsToConvert = new System.Collections.Generic.List<Paragraph>();
+            Block? currentBlock = start;
+
+            while (currentBlock != null)
+            {
+                if (currentBlock is Paragraph para)
+                {
+                    paragraphsToConvert.Add(para);
+                }
+                if (currentBlock == end) break;
+                currentBlock = currentBlock.NextBlock;
+            }
+
+            if (paragraphsToConvert.Count == 0) return;
+
+            // Insert list before first paragraph
+            document.Blocks.InsertBefore(paragraphsToConvert[0], list);
+
+            // Move paragraphs into list items
+            foreach (var para in paragraphsToConvert)
+            {
+                document.Blocks.Remove(para);
+                var item = new ListItem(para);
+                list.ListItems.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Removes a list item from its parent list, converting back to a paragraph.
+        /// </summary>
+        private void RemoveFromList(ListItem listItem)
+        {
+            if (listItem.Parent is not List parentList) return;
+
+            var document = NotesRichTextBox.Document;
+            var para = new Paragraph();
+
+            foreach (var block in listItem.Blocks.ToList())
+            {
+                if (block is Paragraph p)
+                {
+                    foreach (var inline in p.Inlines.ToList())
+                    {
+                        para.Inlines.Add(inline);
+                    }
+                }
+            }
+
+            document.Blocks.InsertAfter(parentList, para);
+            parentList.ListItems.Remove(listItem);
+
+            if (parentList.ListItems.Count == 0)
+            {
+                document.Blocks.Remove(parentList);
+            }
+        }
+
+        /// <summary>
+        /// Updates the Bold toggle button state based on current selection.
+        /// </summary>
+        private void NotesRichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            object fontWeight = NotesRichTextBox.Selection.GetPropertyValue(TextElement.FontWeightProperty);
+            BoldButton.IsChecked = (fontWeight is FontWeight weight && weight == FontWeights.Bold);
+        }
+
+        /// <summary>
+        /// Saves the RichTextBox content to an RTF file for persistence.
+        /// </summary>
+        private void SaveNotes()
+        {
+            try
+            {
+                using var fs = new FileStream(notesFilePath, FileMode.Create);
+                var range = new TextRange(
+                    NotesRichTextBox.Document.ContentStart,
+                    NotesRichTextBox.Document.ContentEnd);
+                range.Save(fs, DataFormats.Rtf);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving notes: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Loads previously saved RTF content into the RichTextBox.
+        /// </summary>
+        private void LoadNotes()
+        {
+            try
+            {
+                if (File.Exists(notesFilePath))
+                {
+                    using var fs = new FileStream(notesFilePath, FileMode.Open);
+                    var range = new TextRange(
+                        NotesRichTextBox.Document.ContentStart,
+                        NotesRichTextBox.Document.ContentEnd);
+                    range.Load(fs, DataFormats.Rtf);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading notes: {ex.Message}");
+            }
         }
     }
 }

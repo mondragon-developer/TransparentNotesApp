@@ -41,7 +41,28 @@
         
         <TabControl Grid.Row="1">
             <TabItem Header="Text">
-                <TextBox x:Name="NotesTextBox" AcceptsReturn="True" TextWrapping="Wrap"/>
+                <DockPanel>
+                    <!-- Formatting Toolbar -->
+                    <ToolBar DockPanel.Dock="Top" Background="#F0F0F0">
+                        <ToggleButton x:Name="BoldButton" Content="B" FontWeight="Bold"
+                                      Width="30" Click="BoldButton_Click" ToolTip="Bold"/>
+                        <Separator/>
+                        <Button x:Name="BulletListButton" Width="30"
+                                Click="BulletListButton_Click" ToolTip="Bullet List">
+                            <TextBlock Text="&#x2022;" FontSize="14"/>
+                        </Button>
+                        <Button x:Name="NumberedListButton" Content="1." Width="30"
+                                Click="NumberedListButton_Click" ToolTip="Numbered List"/>
+                    </ToolBar>
+
+                    <!-- RichTextBox replaces TextBox -->
+                    <RichTextBox x:Name="NotesRichTextBox"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 SelectionChanged="NotesRichTextBox_SelectionChanged">
+                        <FlowDocument/>
+                    </RichTextBox>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Image">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
