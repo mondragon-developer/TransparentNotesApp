@@ -1,6 +1,7 @@
 ﻿<Window x:Class="TransparentNotesApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="Transparent Notes by MDragon" Height="300" Width="600"
         MinWidth="475" MinHeight="100"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -68,6 +69,12 @@
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image Source="path_to_your_image.jpg" Width="200" Height="200"/>
                 </StackPanel>
+            </TabItem>
+            <TabItem Header="Web">
+                <Grid AllowDrop="True" Drop="WebTab_Drop" Background="Transparent">
+                    <TextBlock Text="Drag and drop a URL here" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray" Panel.ZIndex="0"/>
+                    <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Transparent" NavigationCompleted="Browser_NavigationCompleted"/>
+                </Grid>
             </TabItem>
         </TabControl>
         

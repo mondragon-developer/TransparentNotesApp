@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Shapes;
+using Microsoft.Web.WebView2.Core;
 
 namespace TransparentNotesApp
 {
@@ -462,6 +463,62 @@ namespace TransparentNotesApp
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading notes: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Drop event for the Web tab.
+        /// Extracts URL from dropped text and navigates the browser to it.
+        /// </summary>
+        private void WebTab_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                string url = (string)e.Data.GetData(DataFormats.Text);
+                
+                // Simple check if it looks like a URL, if not prepend https://
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                {
+                     // Basic check if it's likely a domain
+                     if (url.Contains(".") && !url.Contains(" "))
+                     {
+                         url = "https://" + url;
+                     }
+                }
+
+                if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                {
+                    try 
+                    {
+                        Browser.Source = new Uri(url);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Invalid URL: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the WebView2 has finished loading a page.
+        /// Injects JavaScript to make the page background transparent.
+        /// </summary>
+        private async void Browser_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            if (e.IsSuccess)
+            {
+                // Inject JavaScript to set the background of the body and html to transparent
+                // This allows the WPF window's transparency to show through
+                try 
+                {
+                    string script = "document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent';";
+                    await Browser.ExecuteScriptAsync(script);
+                }
+                catch (Exception ex) 
+                {
+                    System.Diagnostics.Debug.WriteLine($"Script injection failed: {ex.Message}");
+                }
             }
         }
     }
