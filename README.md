@@ -12,17 +12,23 @@ This application was developed with precision and care to provide a secure notes
 
 ### Core Features
 - **Screen Capture Invisible**: The window is completely hidden from screen sharing software (Zoom, Microsoft Teams, Google Meet, OBS, etc.) using Windows API `SetWindowDisplayAffinity`
+- **Hidden from Taskbar**: Window doesn't appear in the taskbar - fully stealth mode during screen sharing
+- **System Tray Integration**: Access the app via system tray icon (double-click to show/hide, right-click for menu)
 - **Transparent Window**: Semi-transparent notes window (adjustable opacity: 0.1 - 1.0) that doesn't interfere with content visibility
 - **Rich Text Formatting**: Bold text, bullet lists, and numbered lists with a formatting toolbar
 - **Paste from Word/Google Docs**: Supports pasting formatted content including tables from external applications
 - **Automatic Note Persistence**: Notes are automatically saved and restored between sessions (stored as RTF)
-- **Resizable Window**: Drag the bottom-right corner to resize the window to fit your needs
-- **Always on Top**: Toggle window to stay above all other applications
+- **Web Tab with URL Bar**: Type or paste URLs, drag and drop links, browse with transparent background - fully interactive (click links, scroll, fill forms, watch videos)
+- **Private Browsing**: WebView2 runs in InPrivate mode - no history, cookies, or cache saved; all data deleted on close
+- **Resizable Window**: Drag any of the 4 corner handles to resize the window
+- **Draggable Header**: Drag the header bar or toolbar to move the window
+- **Always on Top**: Toggle window to stay above all other applications (even PowerPoint presentations)
 - **Pass-Through Mode**: Press **Alt+P** to toggle mouse pass-through mode - when enabled, mouse clicks pass through the window to applications underneath
 - **Adjustable Opacity**: Use numeric input (0.1 - 1.0) with Enter key to set transparency level
-- **Adjustable Font Size**: Use numeric input (8 - 32) with Enter key to change note text size
-- **Tabbed Interface**: Switch between Text notes and Image content (expandable feature)
-- **Keyboard Shortcut**: Global Alt+P hotkey works even when window is in pass-through mode
+- **Adjustable Font Size**: Use numeric input (8 - 72) with Enter key to change selected text or default size
+- **Zoom Support**: Use **Ctrl+Mouse Wheel** to zoom in/out on text and web content
+- **Tabbed Interface**: Switch between Text notes, Image content, and Web browser
+- **Global Hotkeys**: Alt+P (pass-through), Alt+S (show/front), Alt+H (hide)
 - **Code Signed**: Digitally signed with Microsoft Azure Trusted Signing for security and trust
 
 ## Quick Start
@@ -59,19 +65,29 @@ dotnet publish -c Release
 
 | Control | Action | Purpose |
 |---------|--------|---------|
+| **System Tray Icon** | Double-click | Show/Hide the application window |
+| **System Tray Icon** | Right-click | Access menu (Show/Hide, Exit) |
+| **Header Bar** | Drag | Move the window |
+| **Toolbar** | Drag | Move the window |
+| **Corner Handles** | Drag | Resize the window (4 visible corners) |
 | **Always on Top Checkbox** | Check/Uncheck | Toggle window to stay above all other windows and enable pass-through mode |
 | **Opacity TextBox** | Type value (0.1-1.0) + Enter | Adjust window transparency (0.1 = very transparent, 1.0 = opaque) |
-| **Font Size TextBox** | Type value (8-32) + Enter | Change the size of text in the notes area |
+| **Font Size TextBox** | Type value (8-72) + Enter | Change font size of selected text or set default size |
 | **Bold Button (B)** | Click | Toggle bold formatting on selected text |
 | **Bullet List Button (•)** | Click | Create or toggle bullet list |
 | **Numbered List Button (1.)** | Click | Create or toggle numbered list |
-| **Alt+P Hotkey** | Press anywhere | Toggle pass-through mode (allows clicks to pass through window) |
-| **Bottom-Right Corner** | Drag | Resize the window to your desired dimensions |
+| **Web Tab URL Bar** | Type URL + Enter or Go | Navigate to any website |
+| **Web Tab** | Drag & drop URL | Load a web page with transparent background |
 
 ### Keyboard Shortcuts
 
-- **Alt+P**: Toggle mouse pass-through mode globally
-- **Enter** (in Opacity/Font Size fields): Apply the numeric input value
+| Shortcut | Action |
+|----------|--------|
+| **Alt+P** | Toggle mouse pass-through mode (global) |
+| **Alt+S** | Show window / Bring to front (global) |
+| **Alt+H** | Hide window (global) |
+| **Ctrl+Mouse Wheel** | Zoom in/out on text and web content |
+| **Enter** | Apply value in Opacity/Font Size/URL fields |
 
 ### Minimum Window Size
 - **Width**: 475 pixels
@@ -109,18 +125,21 @@ Main WPF window with event handlers:
 
 ### XAML Structure
 ```
-MainWindow (Transparent, No Title Bar)
+MainWindow (Transparent, No Title Bar, Hidden from Taskbar)
 ├── Grid (2 rows: Auto for controls, * for content)
 │   ├── StackPanel (Row 0 - Controls)
 │   │   ├── AlwaysOnTopCheckBox + Label + Alt+P Tip
 │   │   ├── OpacityTextBox (0.1-1.0)
-│   │   └── FontSizeTextBox (8-32)
+│   │   └── FontSizeTextBox (8-72)
 │   ├── TabControl (Row 1 - Content)
 │   │   ├── Text Tab
 │   │   │   ├── ToolBar (Bold, Bullet List, Numbered List)
 │   │   │   └── RichTextBox (FlowDocument)
-│   │   └── Image Tab (Placeholder)
+│   │   ├── Image Tab (Placeholder)
+│   │   └── Web Tab
+│   │       └── WebView2 (Drag & drop URL, transparent background)
 │   └── ResizeArea (Rectangle overlay - transparent, 40x40)
+└── System Tray Icon (NotifyIcon with context menu)
 ```
 
 ### Notes Storage
@@ -134,13 +153,19 @@ Notes are automatically saved to:
 
 ## Security & Privacy Features
 
-1. Screen Capture Protection: Uses Windows native API to exclude window from screen sharing
+1. **Screen Capture Protection**: Uses Windows native API to exclude window from screen sharing
    - Tested with: Zoom, Microsoft Teams, Google Meet, OBS
    - Note: This only works on Windows; effectiveness may vary by platform/software
 
-2. No Data Transmission: Application stores data locally only
-3. No External Connections: Works completely offline
-4. No Tracking: Zero telemetry or analytics
+2. **Private Web Browsing**: WebView2 runs in InPrivate mode
+   - No browsing history saved
+   - No cookies persisted after session
+   - No cache stored
+   - Temp data folder deleted on app close
+
+3. **No Data Transmission**: Application stores data locally only
+4. **No External Connections**: Works completely offline (except Web tab)
+5. **No Tracking**: Zero telemetry or analytics
 
 ## Advanced Features
 
@@ -181,7 +206,32 @@ When "Always on Top" is checked:
 
 ## Version History
 
-### v1.1 (Current)
+### v1.3 (Current)
+- **Web Tab Enhancements**:
+  - Added URL bar for typing/pasting URLs
+  - Private browsing mode (InPrivate WebView2) - no history, cookies, or cache saved
+  - Fully interactive web pages (click links, scroll, fill forms, watch videos)
+  - Auto-cleanup of temp data on app close
+- **Window Improvements**:
+  - Corner resize handles (4 visible corners)
+  - Drag header or toolbar to move window
+  - Stays on top even against fullscreen apps (PowerPoint presentations)
+  - More transparent control backgrounds
+- **Global Hotkeys**:
+  - Alt+S: Show window / Bring to front
+  - Alt+H: Hide window
+- **Zoom Support**: Ctrl+Mouse Wheel to zoom text and web content
+- Fixed font size to apply to selected text
+
+### v1.2
+- Added Web tab with drag-and-drop URL loading
+- WebView2 integration with transparent background for web pages
+- Hidden from taskbar for complete stealth during screen sharing
+- System tray icon with show/hide and exit options
+- Fixed font size to apply to selected text (not just new text)
+- Increased max font size from 32 to 72
+
+### v1.1
 - Added rich text formatting (bold, bullet lists, numbered lists)
 - Added automatic note persistence (saves/loads RTF format)
 - Added paste support for formatted content from Word/Google Docs
@@ -205,7 +255,6 @@ Suggestions for improvements:
 - Implement color themes
 - Add more keyboard shortcuts (Ctrl+B for bold, etc.)
 - Extend Image tab functionality
-- Add system tray integration
 - Add italic and underline formatting
 
 ## License
@@ -221,12 +270,11 @@ This project is created by José Mondragon (MDragon Solutions) for portfolio pur
 - Auto-backup feature
 - Search functionality
 - Markdown support
-- System tray minimization
 - Cloud sync (optional)
 - Note encryption
 - Export to PDF/TXT
 - Italic and underline formatting
-- Keyboard shortcuts for formatting
+- Keyboard shortcuts for formatting (Ctrl+B, Ctrl+I, etc.)
 
 ## Project Structure
 
@@ -495,7 +543,7 @@ graph TB
     style State fill:#f0f4c3
 ```
 
-**Last Updated**: December 26, 2025
+**Last Updated**: January 8, 2026
 **Created by**: José Mondragon - MDragon Solutions
 **Project Type**: WPF Desktop Application (.NET 10.0)
 

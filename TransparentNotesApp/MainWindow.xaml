@@ -6,6 +6,7 @@
         MinWidth="475" MinHeight="100"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Opacity="0.7"
+        ShowInTaskbar="False"
         MouseDown="Window_MouseDown">
     <Grid>
         <Grid.RowDefinitions>
@@ -16,35 +17,46 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <!-- Controls Row: Always on Top with numeric inputs -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" Margin="10">
-            <!-- Checkbox for Always on Top -->
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="AlwaysOnTopCheckBox" VerticalAlignment="Center" Checked="AlwaysOnTopCheckBox_Checked" Unchecked="AlwaysOnTopCheckBox_Unchecked"/>
-                    <TextBlock Text="Always on Top (Permanent)" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" FontSize="12"/>
-                </StackPanel>
-                <TextBlock Text="Tip: Press Alt+P to toggle pass-through mode" VerticalAlignment="Center" Margin="25,2,0,0" Foreground="Gray" FontSize="9"/>
+        <!-- Controls Row: Draggable header with transparent backgrounds -->
+        <Border Grid.Row="0" Background="#40E0E0E0" MouseDown="DragArea_MouseDown" Cursor="SizeAll" Padding="10,5">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Always on Top Control -->
+                <Border Background="#50FFFFFF" CornerRadius="4" Padding="8,4" Margin="0,0,10,0">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="AlwaysOnTopCheckBox" VerticalAlignment="Center" Checked="AlwaysOnTopCheckBox_Checked" Unchecked="AlwaysOnTopCheckBox_Unchecked"/>
+                            <TextBlock Text="Always on Top" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" FontSize="12"/>
+                        </StackPanel>
+                        <TextBlock Text="Alt+P: Pass-through | Alt+S: Show | Alt+H: Hide" VerticalAlignment="Center" Margin="20,2,0,0" Foreground="Gray" FontSize="8"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Opacity Control -->
+                <Border Background="#50FFFFFF" CornerRadius="4" Padding="8,4" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Opacity:" VerticalAlignment="Center" Foreground="Black" FontSize="12" Margin="0,0,5,0"/>
+                        <TextBox x:Name="OpacityTextBox" Width="50" Height="24" VerticalAlignment="Center" PreviewKeyDown="OpacityTextBox_PreviewKeyDown"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Font Size Control -->
+                <Border Background="#50FFFFFF" CornerRadius="4" Padding="8,4" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Font Size:" VerticalAlignment="Center" Foreground="Black" FontSize="12" Margin="0,0,5,0"/>
+                        <TextBox x:Name="FontSizeTextBox" Width="50" Height="24" VerticalAlignment="Center" PreviewKeyDown="FontSizeTextBox_PreviewKeyDown" GotFocus="FontSizeTextBox_GotFocus"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Zoom info -->
+                <TextBlock Text="Ctrl+Wheel: Zoom" VerticalAlignment="Center" Foreground="Gray" FontSize="9"/>
             </StackPanel>
-            
-            <!-- Opacity Control -->
-            <StackPanel Orientation="Horizontal" Margin="20,0,0,0" VerticalAlignment="Center">
-                <TextBlock Text="Opacity:" VerticalAlignment="Center" Foreground="Black" FontSize="12" Margin="0,0,5,0"/>
-                <TextBox x:Name="OpacityTextBox" Width="50" Height="24" VerticalAlignment="Center" PreviewKeyDown="OpacityTextBox_PreviewKeyDown"/>
-            </StackPanel>
-            
-            <!-- Font Size Control -->
-            <StackPanel Orientation="Horizontal" Margin="20,0,0,0" VerticalAlignment="Center">
-                <TextBlock Text="Font Size:" VerticalAlignment="Center" Foreground="Black" FontSize="12" Margin="0,0,5,0"/>
-                <TextBox x:Name="FontSizeTextBox" Width="50" Height="24" VerticalAlignment="Center" PreviewKeyDown="FontSizeTextBox_PreviewKeyDown"/>
-            </StackPanel>
-        </StackPanel>
-        
-        <TabControl Grid.Row="1">
+        </Border>
+
+        <TabControl Grid.Row="1" PreviewMouseWheel="TabControl_PreviewMouseWheel">
             <TabItem Header="Text">
                 <DockPanel>
-                    <!-- Formatting Toolbar -->
-                    <ToolBar DockPanel.Dock="Top" Background="#F0F0F0">
+                    <!-- Formatting Toolbar - also serves as drag handle -->
+                    <ToolBar DockPanel.Dock="Top" Background="#40E0E0E0" MouseDown="DragArea_MouseDown" Cursor="SizeAll">
                         <ToggleButton x:Name="BoldButton" Content="B" FontWeight="Bold"
                                       Width="30" Click="BoldButton_Click" ToolTip="Bold"/>
                         <Separator/>
@@ -71,14 +83,33 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Web">
-                <Grid AllowDrop="True" Drop="WebTab_Drop" Background="Transparent">
-                    <TextBlock Text="Drag and drop a URL here" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray" Panel.ZIndex="0"/>
-                    <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Transparent" NavigationCompleted="Browser_NavigationCompleted"/>
-                </Grid>
+                <DockPanel>
+                    <!-- URL Bar -->
+                    <Border DockPanel.Dock="Top" Background="#40E0E0E0" Padding="5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="UrlTextBox" Grid.Column="0" Height="24" VerticalContentAlignment="Center"
+                                     Text="https://" PreviewKeyDown="UrlTextBox_PreviewKeyDown"
+                                     ToolTip="Enter URL and press Enter or click Go"/>
+                            <Button Grid.Column="1" Content="Go" Width="40" Margin="5,0,0,0" Click="GoButton_Click"/>
+                        </Grid>
+                    </Border>
+                    <!-- Web Content -->
+                    <Grid AllowDrop="True" Drop="WebTab_Drop" Background="Transparent">
+                        <TextBlock x:Name="WebHintText" Text="Enter URL above or drag and drop a link here" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray" IsHitTestVisible="False"/>
+                        <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Transparent" NavigationCompleted="Browser_NavigationCompleted"/>
+                    </Grid>
+                </DockPanel>
             </TabItem>
         </TabControl>
         
-        <!-- Transparent resize handle overlay in bottom-right corner -->
-        <Rectangle x:Name="ResizeArea" Grid.Row="0" Grid.RowSpan="2" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNWSE" MouseDown="ResizeArea_MouseDown" MouseMove="ResizeArea_MouseMove" MouseUp="ResizeArea_MouseUp" Margin="0,0,0,0"/>
+        <!-- Corner resize handles only -->
+        <Rectangle x:Name="ResizeTopLeft" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#40000000" Cursor="SizeNWSE" MouseDown="ResizeEdge_MouseDown" MouseMove="ResizeEdge_MouseMove" MouseUp="ResizeEdge_MouseUp" Tag="TopLeft"/>
+        <Rectangle x:Name="ResizeTopRight" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Top" Fill="#40000000" Cursor="SizeNESW" MouseDown="ResizeEdge_MouseDown" MouseMove="ResizeEdge_MouseMove" MouseUp="ResizeEdge_MouseUp" Tag="TopRight"/>
+        <Rectangle x:Name="ResizeBottomLeft" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="#40000000" Cursor="SizeNESW" MouseDown="ResizeEdge_MouseDown" MouseMove="ResizeEdge_MouseMove" MouseUp="ResizeEdge_MouseUp" Tag="BottomLeft"/>
+        <Rectangle x:Name="ResizeBottomRight" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#40000000" Cursor="SizeNWSE" MouseDown="ResizeEdge_MouseDown" MouseMove="ResizeEdge_MouseMove" MouseUp="ResizeEdge_MouseUp" Tag="BottomRight"/>
     </Grid>
 </Window>
